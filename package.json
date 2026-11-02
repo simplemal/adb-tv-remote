@@ -1,0 +1,38 @@
+{
+  "name": "adb-tv-remote",
+  "productName": "ADB TV Remote",
+  "version": "0.1.0",
+  "description": "Desktop remote control with a live screen preview for Fire TV and Android TV devices over network ADB.",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplemal/adb-tv-remote.git"
+  },
+  "homepage": "https://github.com/simplemal/adb-tv-remote",
+  "author": "simplemal",
+  "private": true,
+  "main": "src/main/main.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test --test-concurrency=1 \"test/unit/*.test.js\"",
+    "test:e2e": "node --test --test-concurrency=1 --test-timeout=45000 \"test/e2e/*.test.js\"",
+    "fetch:adb": "node scripts/fetch-adb.mjs",
+    "build:ffmpeg": "bash scripts/build-ffmpeg.sh",
+    "prepare:bin": "npm run fetch:adb && npm run build:ffmpeg",
+    "build:mac": "npm run prepare:bin && electron-builder --mac",
+    "build:all": "bash scripts/build-all.sh",
+    "build:mac:quick": "bash scripts/build-all.sh mac",
+    "build:mac:notarized": "bash scripts/build-all.sh mac notarize",
+    "build:win": "electron-builder --win",
+    "build:linux": "npm run prepare:bin && electron-builder --linux",
+    "test:packaged": "node test/smoke-packaged.js"
+  },
+  "devDependencies": {
+    "electron": "45.2.0",
+    "electron-builder": "26.18.0",
+    "playwright-core": "1.64.1"
+  }
+}
