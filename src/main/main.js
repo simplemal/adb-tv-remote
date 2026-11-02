@@ -5,6 +5,7 @@ const { findTool } = require('./binaries');
 const { Controller } = require('./controller');
 const { scan } = require('./scan');
 const { Store } = require('./store');
+const { Updates } = require('./updates');
 
 const ADB_DOWNLOAD_PAGE = 'https://developer.android.com/tools/releases/platform-tools';
 const FRAME_ACK_TIMEOUT_MS = 2000;
@@ -19,6 +20,8 @@ const bundledDir = app.isPackaged
 
 let window = null;
 let controller = null;
+let updates = null;
+let closing = false;
 
 /** Sends the newest frame only: a slow window skips frames instead of falling behind. */
 class FrameSender {
@@ -96,9 +99,28 @@ function connectPage() {
   handle('findDevices', () => scan());
   handle('openAdbHelp', () => shell.openExternal(ADB_DOWNLOAD_PAGE));
   listen('frameShown', () => frames.shown());
+  listen('installUpdate', installUpdate);
   controller.on('state', state => window?.webContents.send('state', state));
   controller.on('frame', (data, kind) => frames.send(data, kind));
   controller.on('echo', (key, down) => window?.webContents.send('key:echo', key, down));
+}
+
+/** Only a packaged app has anything to replace: `npm start` runs from the source. */
+function watchUpdates() {
+  if (!app.isPackaged) return;
+  const { autoUpdater } = require('electron-updater');
+  updates = new Updates({
+    updater: autoUpdater,
+    onReady: version => window?.webContents.send('update:ready', version),
+  });
+  updates.start();
+}
+
+function installUpdate() {
+  if (!updates?.version || closing) return;
+  closing = true;
+  updates.stop();
+  controller.shutdown().finally(() => updates.updater.quitAndInstall());
 }
 
 function buildMenu() {
@@ -126,6 +148,7 @@ function start() {
   connectPage();
   createWindow();
   controller.poll();
+  watchUpdates();
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -137,7 +160,6 @@ if (!app.requestSingleInstanceLock()) {
   });
   app.on('window-all-closed', () => app.quit());
 
-  let closing = false;
   app.on('before-quit', event => {
     if (closing || !controller) return;
     closing = true;

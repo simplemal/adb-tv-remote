@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('tvRemote', {
   setCommand: ask('setCommand'),
   setLanguage: ask('setLanguage'),
   openAdbHelp: ask('openAdbHelp'),
+  installUpdate: tell('installUpdate'),
   sendKey: tell('key'),
   sendTouch: tell('touch'),
   sendText: tell('text'),
@@ -21,5 +22,6 @@ contextBridge.exposeInMainWorld('tvRemote', {
   frameShown: tell('frameShown'),
   onState: listener => ipcRenderer.on('state', (_event, state) => listener(state)),
   onFrame: listener => ipcRenderer.on('screen:frame', (_event, frame) => listener(frame)),
+  onUpdateReady: listener => ipcRenderer.on('update:ready', (_event, version) => listener(version)),
   onKeyEcho: listener => ipcRenderer.on('key:echo', (_event, key, down) => listener(key, down)),
 });

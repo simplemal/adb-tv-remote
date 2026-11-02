@@ -417,6 +417,8 @@ function show(next) {
 const reportVisibility = () => tvRemote.setVisible(!document.hidden);
 document.addEventListener('visibilitychange', reportVisibility);
 
+byId('update-ready').addEventListener('click', () => tvRemote.installUpdate());
+tvRemote.onUpdateReady(() => { byId('update-ready').hidden = false; });
 tvRemote.onState(show);
 reportVisibility();
 tvRemote.getState().then(first => {

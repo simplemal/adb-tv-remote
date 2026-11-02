@@ -1,33 +1,71 @@
 # ADB TV Remote
 
-A desktop remote control for Fire TV and Android TV devices, with a live picture of the TV's screen beside the buttons. It works over your home network through ADB. There is no account, no cloud and no app to install on the TV.
+Control your Fire TV or Android TV from your computer, and see its screen while you do.
 
-- Drawn remote: D-pad, OK, Back, Home, Menu, media keys, volume, mute, TV guide and power.
-- Live 16:9 preview, 960×540.
-- Keys land in about 15 ms, against nearly a second for `adb shell input keyevent`.
-- Long press on OK, Back, Home and Menu.
-- Type on the TV from your keyboard.
-- Several saved devices, a setup guide on first launch, and clear messages when something is wrong.
+![ADB TV Remote, with the TV's screen on the left and the remote on the right](docs/screenshot.png)
+
+It talks to the TV over your home network. There is no account, no cloud service, and nothing to install on the TV.
+
+- **A full remote:** D-pad, OK, Back, Home, Menu, media keys, volume, mute, TV guide and power.
+- **A live picture of the TV**, right next to the buttons. Click on it to touch the screen.
+- **Fast:** a key reaches the TV in about 15 milliseconds.
+- **Long press** on OK, Back, Home and Menu.
+- **Type on the TV** from your keyboard.
+- **Several TVs:** save them and switch between them.
+- **Updates itself** from this page.
 - English and Italian.
 
-This project is not affiliated with Amazon or Google. Fire TV, Android TV and Google TV are their trademarks.
+## Download
 
-## Which devices work
+**[Download the latest version](https://github.com/simplemal/adb-tv-remote/releases/latest)** for a Mac with Apple silicon: take the `.dmg` file, open it and drag the app to Applications.
 
-| Device | Works? |
+Builds are signed but not yet notarized by Apple, so the first time macOS may block the app: open **System Settings → Privacy & Security** and choose **Open Anyway**. macOS also asks to let the app use the local network: allow it, or the app cannot reach the TV.
+
+When a new version is out, the app downloads it by itself and shows a **New version ready** button. Press it when you like: the app restarts and is up to date.
+
+## What works with it
+
+### TVs and sticks
+
+| Device | Status |
 |---|---|
-| Fire TV devices on Fire OS | Yes, with ADB debugging on |
-| Android TV and Google TV with ADB on port 5555 | Yes, with ADB debugging on |
-| Devices that offer only Android 11 "Wireless debugging" with a pairing code | Not yet: the app does not pair |
-| Fire TV devices on Vega OS (newer sticks, including the Fire TV Stick 4K Select) | Not expected to work: Vega is not Android |
+| Fire TV Stick 4K, 2nd generation (Fire OS 8) | **Tested:** everything works |
+| Fire TV Stick 4K Max, 2nd generation (Fire OS 8) | **Tested in part:** it connects; the rest is being checked |
+| Fire TV Stick 4K Max, 1st generation (Fire OS 7) | **Tested in part:** it connects and the keys work; picture, touch and standby are being checked |
+| Other Fire TV devices with Fire OS | **Should work,** not tried yet |
+| Android TV and Google TV with ADB on port 5555 | **Should work,** not tried yet |
+| Devices that offer only Android 11 "Wireless debugging" with a pairing code | **Not yet:** the app cannot pair |
+| Fire TV devices with Vega OS, such as the Fire TV Stick 4K Select | **No:** Vega is not Android |
 
-## Use
+If you try it on another device, please tell how it went in an [issue](https://github.com/simplemal/adb-tv-remote/issues).
 
-1. Open the app. The guide shows how to turn on ADB debugging on the TV.
-2. Enter the TV's IP address, or press **Find on network**.
-3. Choose **Allow** on the TV.
+### Computers
 
-The Wi-Fi key on the remote opens the device list. Hold a key for a long press.
+| Computer | Status |
+|---|---|
+| Mac with Apple silicon | **Tested,** ready to download |
+| Mac with an Intel processor | No download: it can be built from the source on an Intel Mac |
+| Windows and Linux | Prepared, but never tried: no download yet |
+
+## First steps
+
+**On the TV,** once only:
+
+1. Open **Settings → My Fire TV → Developer Options** and turn on **ADB debugging**.
+2. No Developer Options? Open **My Fire TV → About** and press OK seven times on the name of the device.
+
+On Android TV and Google TV the path is different: look for Developer options and turn on USB debugging and, if it is listed, Network debugging.
+
+**In the app:**
+
+1. Enter the TV's IP address, or press **Find on network**.
+2. A window appears on the TV: tick **Always allow from this computer** and choose **Allow**.
+
+The computer and the TV must be on the same network. A guest Wi-Fi often keeps devices apart.
+
+## Using it
+
+The Wi-Fi key on the remote opens the list of TVs. Hold a key for a long press.
 
 | Keyboard | Sends |
 |---|---|
@@ -38,11 +76,7 @@ The Wi-Fi key on the remote opens the device list. Hold a key for a long press.
 | M | Menu |
 | Space | Play/pause |
 
-**Find on network** only runs when you press it. It tries port 5555 on the local /24 networks of this computer, and sends nothing to what it finds.
-
-### Opening an unsigned build on macOS
-
-Builds from this repository are not notarized by Apple. macOS blocks them the first time: open **System Settings → Privacy & Security** and choose **Open Anyway**. macOS also asks to let the app use the local network; it needs that permission to reach the TV.
+**Find on network** only runs when you press it. It tries port 5555 on your local networks, and sends nothing to what it finds.
 
 ## Limits
 
@@ -85,7 +119,7 @@ npm run test:packaged  # the built app; run it after a macOS build
 To build one package on the operating system it is for:
 
 ```sh
-npm run build:mac     # dist/ADB TV Remote-<version>-<arch>.dmg and dist/mac-<arch>/*.app
+npm run build:mac     # dist/adb-tv-remote-<version>-<arch>.dmg and dist/mac-<arch>/*.app
 npm run build:linux   # AppImage and .deb
 ```
 
@@ -160,6 +194,8 @@ The result is `out/classes.dex`. Copy it over `resources/keyinput/keyinput.dex`.
 
 The default macOS build has an ad-hoc signature, so it needs no certificate. `npm run build:all` signs with a Developer ID certificate if the keychain has one, and notarizes if a notarytool profile is saved under the name `notarize` (`xcrun notarytool store-credentials notarize`). Neither is stored in this repository.
 
+The app updates itself from this repository's releases: it downloads a new version in the background and offers a restart. On a Mac that needs the zip, `latest-mac.yml` and a build signed with the same certificate, so `build:all` leaves them in `dist` to attach to the release along with the dmg.
+
 For every release, because of the LGPL:
 
 1. Attach `.cache/ffmpeg/ffmpeg-<version>.tar.xz` to the same release as the binaries.
@@ -167,4 +203,4 @@ For every release, because of the LGPL:
 
 ## License
 
-PolyForm Noncommercial 1.0.0, see `LICENSE` and `NOTICE.md`: free to use and derive, not to sell. All trademarks belong to their owners. Packaged builds include third-party programs under their own licenses: see `THIRD_PARTY_NOTICES.md`.
+The source is public, and you are free to use, study, change and share it for any non-commercial purpose, but not to sell it. That makes it source-available rather than open source in the strict sense: see `LICENSE` (PolyForm Noncommercial 1.0.0) and `NOTICE.md`. This project is not affiliated with Amazon or Google: Fire TV, Android TV and Google TV are their trademarks. All trademarks belong to their owners. Packaged builds include third-party programs under their own licenses: see `THIRD_PARTY_NOTICES.md`.

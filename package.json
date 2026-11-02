@@ -1,7 +1,7 @@
 {
   "name": "adb-tv-remote",
   "productName": "ADB TV Remote",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Desktop remote control with a live screen preview for Fire TV and Android TV devices over network ADB.",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
@@ -34,5 +34,8 @@
     "electron": "45.2.0",
     "electron-builder": "26.18.0",
     "playwright-core": "1.64.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
   }
 }

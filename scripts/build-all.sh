@@ -33,10 +33,10 @@ if [ -n "$IDENTITY" ]; then
   fi
 fi
 
-npx electron-builder --mac --arm64 -c.directories.output="$OUT" ${MAC_SIGNING[@]+"${MAC_SIGNING[@]}"}
+npx electron-builder --mac --arm64 --publish never -c.directories.output="$OUT" ${MAC_SIGNING[@]+"${MAC_SIGNING[@]}"}
 if [ "${1:-}" != mac ]; then
-  npx electron-builder --win --x64 -c.directories.output="$OUT"
-  npx electron-builder --linux --x64 -c.directories.output="$OUT"
+  npx electron-builder --win --x64 --publish never -c.directories.output="$OUT"
+  npx electron-builder --linux --x64 --publish never -c.directories.output="$OUT"
 fi
 
 mkdir -p dist
@@ -46,5 +46,5 @@ ANDROID_ADB_SERVER_PORT="$(node -p "require('./src/main/adb').SERVER_PORT")" \
 ditto "$OUT/mac-arm64/ADB TV Remote.app" "dist/mac-arm64/ADB TV Remote.app.new"
 rm -rf "dist/mac-arm64/ADB TV Remote.app"
 mv "dist/mac-arm64/ADB TV Remote.app.new" "dist/mac-arm64/ADB TV Remote.app"
-find "$OUT" -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} dist/ \;
-ls -lh dist | grep -E '\.(dmg|exe|AppImage|deb)$'
+find "$OUT" -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.zip' -o -name 'latest*.yml' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} dist/ \;
+ls -lh dist | grep -E '\.(dmg|zip|yml|exe|AppImage|deb)$'

@@ -1,7 +1,10 @@
 appId: org.adbtvremote.desktop
 productName: ADB TV Remote
 copyright: Copyright (c) 2026 ADB TV Remote contributors
-publish: null
+publish:
+  provider: github
+  owner: simplemal
+  repo: adb-tv-remote
 directories:
   output: dist
   buildResources: build
@@ -28,7 +31,11 @@ mac:
       to: bin
   category: public.app-category.utilities
   icon: build/Icon.icon
-  target: dmg
+  # The zip is what the app updates itself from, and its name must be the one latest-mac.yml says.
+  artifactName: adb-tv-remote-${version}-${arch}.${ext}
+  target:
+    - dmg
+    - zip
   # "-" is an ad-hoc signature, which needs no certificate. It also stops electron-builder from
   # picking up whatever certificate is in the keychain. For a release, see README, "Signing".
   identity: "-"

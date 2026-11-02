@@ -160,3 +160,24 @@ test('scan: a device that answers and refuses counts, one that says nothing does
   await new Promise(resolve => { server.close(resolve); });
   assert.equal(await probe('127.0.0.1', port), 'alive');
 });
+
+test('updates: download alone, install only on request, and stay quiet offline', async () => {
+  const { EventEmitter } = require('node:events');
+  const { Updates } = require('../../src/main/updates');
+  const updater = new EventEmitter();
+  let checks = 0;
+  updater.checkForUpdates = () => { checks += 1; return Promise.reject(new Error('offline')); };
+  const ready = [];
+  const updates = new Updates({ updater, onReady: version => ready.push(version) });
+  assert.equal(updater.autoDownload, true);
+  assert.equal(updater.autoInstallOnAppQuit, false, 'never while the app may be driving a TV');
+  updates.check();
+  await new Promise(resolve => { setImmediate(resolve); });
+  updater.emit('error', new Error('offline'));
+  assert.equal(checks, 1);
+  updater.emit('update-downloaded', { version: '9.9.9' });
+  assert.deepEqual(ready, ['9.9.9']);
+  updates.check();
+  assert.equal(checks, 1, 'nothing to ask while one is waiting');
+  updates.stop();
+});
