@@ -19,7 +19,7 @@ It talks to the TV over your home network. There is no account, no cloud service
 
 **[Download the latest version](https://github.com/simplemal/adb-tv-remote/releases/latest)** for a Mac with Apple silicon: take the `.dmg` file, open it and drag the app to Applications.
 
-Builds are signed but not yet notarized by Apple, so the first time macOS may block the app: open **System Settings → Privacy & Security** and choose **Open Anyway**. macOS also asks to let the app use the local network: allow it, or the app cannot reach the TV.
+The app is signed and notarized by Apple, so it opens normally. macOS asks to let it use the local network: allow it, or the app cannot reach the TV.
 
 When a new version is out, the app downloads it by itself and shows a **New version ready** button. Press it when you like: the app restarts and is up to date.
 
